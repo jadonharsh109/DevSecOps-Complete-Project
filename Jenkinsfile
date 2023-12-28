@@ -38,6 +38,13 @@ pipeline {
             }
         }
 
+        stage('OWASP Analysis') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'owasp-scanner'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+
         stage ("Clean Workspace") {
             steps {
                 cleanWs()
