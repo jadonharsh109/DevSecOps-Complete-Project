@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    tools{
+        jdk "jdk17"
+        nodejs "nodejs16"
+    }
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
+
     stages{
         stage('Retrieve Committer Email') {
             steps {
@@ -16,6 +25,18 @@ pipeline {
         stage ("Clean Workspace") {
             steps {
                 cleanWs()
+            }
+        }
+        stage ("SonarQube Analysis") {
+            steps{
+                sh '''cd Application && $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=node-project -Dsonar.projectKey=node-project '''
+            }
+        }
+        stage ("SonarQube QualityChecks") {
+            steps{
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: "sonar-token"
+                }
             }
         }
     }
