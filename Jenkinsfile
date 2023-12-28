@@ -74,7 +74,7 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Run Docker Images') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_HUB_USERNAME')]){
                     sh "docker run -p 80:80 ${DOCKER_HUB_USERNAME}/youtube"
