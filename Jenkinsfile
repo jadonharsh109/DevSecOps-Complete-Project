@@ -24,7 +24,7 @@ pipeline {
         }
         
         stage ("SonarQube Analysis") {
-            steps{
+            withSonarQubeEnv('sonar-server') {
                 sh '''cd Application && $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=node-project -Dsonar.projectKey=node-project '''
             }
         }
