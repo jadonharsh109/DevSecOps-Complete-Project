@@ -22,11 +22,7 @@ pipeline {
                 }
             }
         }
-        stage ("Clean Workspace") {
-            steps {
-                cleanWs()
-            }
-        }
+        
         stage ("SonarQube Analysis") {
             steps{
                 sh '''cd Application && $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=node-project -Dsonar.projectKey=node-project '''
@@ -37,6 +33,12 @@ pipeline {
                 script {
                     waitForQualityGate abortPipeline: false, credentialsId: "sonar-token"
                 }
+            }
+        }
+
+        stage ("Clean Workspace") {
+            steps {
+                cleanWs()
             }
         }
     }
