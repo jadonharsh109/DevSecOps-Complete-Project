@@ -8,6 +8,7 @@ pipeline {
 
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
+        API_KEY = "0e775d38damsh312b38c4f07187ep17a05ejsn994883147928"
     }
 
     stages{
@@ -68,8 +69,7 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 withCredentials([
-                    usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_HUB_USERNAME'), 
-                    string(credentialsId: 'api-token', variable: 'API_KEY')
+                    usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_HUB_USERNAME')
                 ]){
                     sh "docker build --build-arg REACT_APP_RAPID_API_KEY=${API_KEY} -t ${DOCKER_HUB_USERNAME}/youtube Application/Dockerfile"
                 }
