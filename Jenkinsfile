@@ -2,11 +2,6 @@ pipeline {
     agent any
 
     stages{
-        stage ("Hello World") {
-            steps {
-                cho "hello world from jenkins"
-            }
-        }
         stage('Retrieve Committer Email') {
             steps {
                 script {
@@ -16,6 +11,11 @@ pipeline {
                     ).trim()
                     echo "Committer email: ${committerEmail}"
                 }
+            }
+        }
+        stage ("Hello World") {
+            steps {
+                cho "hello world from jenkins"
             }
         }
     }
