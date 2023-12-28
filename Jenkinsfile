@@ -68,8 +68,8 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 withCredentials([
-                    usernamePassword(credentialsId: 'dockerhub-cred', variable: 'API_KEY'), 
-                    string(credentialsId: 'api-token', usernameVariable: 'DOCKER_HUB_USERNAME')
+                    usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'API_KEY'), 
+                    string(credentialsId: 'api-token', variable: 'DOCKER_HUB_USERNAME')
                 ]){
                     sh '''docker build --build-arg REACT_APP_RAPID_API_KEY=${API_KEY} -t ${DOCKER_HUB_USERNAME}/youtube .'''
                 }
