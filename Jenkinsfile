@@ -71,7 +71,7 @@ pipeline {
                 withCredentials([
                     usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_HUB_USERNAME')
                 ]){
-                    sh "docker build --build-arg REACT_APP_RAPID_API_KEY=${API_KEY} -t ${DOCKER_HUB_USERNAME}/youtube Application/Dockerfile"
+                    sh '''docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t ${DOCKER_HUB_USERNAME}/youtube Application/Dockerfile'''
                 }
             }
         }
