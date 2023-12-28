@@ -47,7 +47,7 @@ pipeline {
 
         stage('Trivy Analysis') {
             steps {
-                sh "trivy fs . -f json -o trivy-check-report.json"
+                sh "trivy fs . --exit-code 1 --severity CRITICAL -f json -o trivy-check-report.json"
             }
         }
 
