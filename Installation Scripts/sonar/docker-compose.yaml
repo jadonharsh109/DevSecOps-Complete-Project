@@ -1,0 +1,19 @@
+version: "3.8" # Specify the Docker Compose file version
+
+services:
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonarqube
+    ports:
+      - "9000:9000" # Map port 9000 of the container to port 9000 on the host
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data # Mount a volume for persistent data
+      - sonarqube_extensions:/opt/sonarqube/extensions # Mount a volume for extensions
+      - sonarqube_logs:/opt/sonarqube/logs # Mount a volume for logs
+
+    restart: always
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
