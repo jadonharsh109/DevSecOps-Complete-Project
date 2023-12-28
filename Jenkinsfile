@@ -69,13 +69,22 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh "docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $DOCKER_HUB_USERNAME/youtube Application/."
+                sh "docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $DOCKER_HUB_USERNAME/youtube:latest Application/."
             }
         }
 
-        stage('Run Docker Images') {
+        stage('Deploy Docker Images') {
             steps {
-                sh "docker run -p 80:80 $DOCKER_HUB_USERNAME/youtube"
+                script {
+                    withDockerRegistry(credentialsId: 'dockerhub-cred', toolName: 'docker'){
+                        sh "docker push $DOCKER_HUB_USERNAME/youtube:latest "
+                    }
+                }
+                post{
+                    always {
+                        sh '''docker rmi $(docker images --filter "dangling=true" -q --no-trunc)'''
+                    }
+                }
             }
         }
     }
@@ -89,5 +98,5 @@ pipeline {
             echo 'Discord Notifications'
             discordSend description: "${JOB_NAME} Triggered By GitHub Push (${committerEmail})", footer: "${BUILD_NUMBER} Build Success!!", link: BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "https://discord.com/api/webhooks/1187472599043805335/5xoeKJ9NtiPp0tbS1B7c8yJb8BzTVu1NOPQscRJIpXXy4VrmFn2j9pJAqwa6q9g3N9Xz"
         }
-}
+    }
 }
