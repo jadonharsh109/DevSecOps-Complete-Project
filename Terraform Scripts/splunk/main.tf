@@ -15,7 +15,7 @@ resource "aws_security_group" "splunk_security_group" {
   description = "splunk_Security_group is created by Terraform"
 
   dynamic "ingress" {
-    for_each = [22, 8000]
+    for_each = [22, 8000, 8088]
     iterator = port
 
     content {
