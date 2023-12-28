@@ -47,7 +47,7 @@ pipeline {
 
         stage('Trivy Analysis') {
             steps {
-                sh '''trivy fs . --exit-code 1 --severity CRITICAL --format template --template "@html.tpl" -o trivy-check-report.html'''
+                sh '''trivy fs . --exit-code 1 --severity CRITICAL --format template --template \"@/home/vijeta1/contrib/html.tpl\" -o trivy-check-report.html'''
 
                 publishHTML target : [
                     allowMissing: true,
