@@ -45,6 +45,12 @@ pipeline {
             }
         }
 
+        stage('Trivy Analysis') {
+            steps {
+                sh "trivy fs -f json -o trivy-check-report.json"
+            }
+        }
+
         // stage ("Clean Workspace") {
         //     steps {
         //         cleanWs()
