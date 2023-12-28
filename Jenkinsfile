@@ -47,14 +47,14 @@ pipeline {
 
         stage('Trivy Analysis') {
             steps {
-                sh '''trivy fs . --exit-code 1 --severity CRITICAL --format template --template \"@/home/vijeta1/contrib/html.tpl\" -o trivy-check-report.html'''
+                sh '''trivy fs . --exit-code 1 --severity CRITICAL --format json -o trivy-check-report.json'''
 
                 publishHTML target : [
                     allowMissing: true,
                     alwaysLinkToLastBuild: true,
                     keepAll: true,
                     reportDir: '.',
-                    reportFiles: 'trivy-check-report.html',
+                    reportFiles: 'trivy-check-report.json',
                     reportName: 'Trivy Scan',
                     reportTitles: 'Trivy Scan'
                 ]
