@@ -4,7 +4,7 @@ pipeline {
     stages{
         stage ("Hello World") {
             steps {
-                echo "hello world from jenkins"
+                cho "hello world from jenkins"
             }
         }
         stage('Retrieve Committer Email') {
