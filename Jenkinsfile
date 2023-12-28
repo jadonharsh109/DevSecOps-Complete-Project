@@ -64,6 +64,23 @@ pipeline {
         //         cleanWs()
         //     }
         // }
+
+        stage('Build Docker Images') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'api-token', variable: 'API_KEY'), 
+                string(credentialsId: dockerhub-cred, usernameVariable: 'DOCKER_HUB_USERNAME')]){
+                    sh '''docker build --build-arg REACT_APP_RAPID_API_KEY=${API_KEY} -t ${DOCKER_HUB_USERNAME}/youtube .'''
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_HUB_USERNAME')]){
+                    sh "docker run -p 80:80 ${DOCKER_HUB_USERNAME}/youtube"
+                }
+            }
+        }
     }
 
     post {
