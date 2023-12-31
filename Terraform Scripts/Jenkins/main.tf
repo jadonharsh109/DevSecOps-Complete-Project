@@ -38,7 +38,7 @@ resource "aws_security_group" "jenkins_security_group" {
 
 resource "aws_instance" "jenkins_instance" {
   ami             = "ami-03f4878755434977f"
-  instance_type   = "t2.medium"
+  instance_type   = "t2.large"
   key_name        = aws_key_pair.jenkins-key-pair.key_name
   security_groups = ["${aws_security_group.jenkins_security_group.name}"]
   tags = {
