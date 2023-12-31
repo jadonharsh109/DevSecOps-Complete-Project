@@ -80,10 +80,10 @@ pipeline {
                         sh "docker push $DOCKER_HUB_USERNAME/youtube:latest "
                     }
                 }
-                post{
-                    always {
-                        sh '''docker rmi $(docker images --filter "dangling=true" -q --no-trunc)'''
-                    }
+            }
+            post{
+                always {
+                    sh '''docker rmi $(docker images --filter "dangling=true" -q --no-trunc)'''
                 }
             }
         }
