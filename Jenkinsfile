@@ -31,6 +31,7 @@ pipeline {
         }
         
         stage ("SonarQube Analysis") {
+        when { expression { params.action == 'create'}}
             steps{
                 withSonarQubeEnv('sonar-server') {
                     sh '''cd Application && $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=node-project -Dsonar.projectKey=node-project '''
@@ -38,6 +39,7 @@ pipeline {
             }
         }
         stage ("SonarQube QualityChecks") {
+        when { expression { params.action == 'create'}}
             steps{
                 script {
                     waitForQualityGate abortPipeline: false, credentialsId: "sonar-token"
@@ -46,6 +48,7 @@ pipeline {
         }
 
         stage('OWASP Analysis') {
+        when { expression { params.action == 'create'}}
             steps {
                 dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'owasp-scanner'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
@@ -53,6 +56,7 @@ pipeline {
         }
 
         stage('Trivy Analysis') {
+        when { expression { params.action == 'create'}}
             steps {
                 sh '''trivy fs . --format json -o trivy-fs-report.json'''
             }
@@ -67,6 +71,7 @@ pipeline {
         // }
 
         stage('Build Docker Images') {
+        when { expression { params.action == 'create'}}
             steps {
                 sh "docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest Application/."
             }
@@ -93,6 +98,7 @@ pipeline {
         }
 
         stage('Deploy Docker Images') {
+        when { expression { params.action == 'create'}}
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'dockerhub-cred', toolName: 'docker'){
@@ -108,6 +114,7 @@ pipeline {
         }
 
         stage('Test Docker Images') {
+        when { expression { params.action == 'create'}}
             steps {
                 sh "trivy image $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest -o trivy-image-report.json"
             }
