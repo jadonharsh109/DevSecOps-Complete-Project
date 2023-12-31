@@ -9,7 +9,11 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
         API_KEY = "0e775d38damsh312b38c4f07187ep17a05ejsn994883147928"
-        DOCKER_HUB_USERNAME = "jadonharsh"
+    }
+
+    parameters{
+        string (name: 'DOCKER_HUB_USERNAME', defaultValue: 'jadonharsh', description: 'Docker Hub Username')
+        string (name: 'IMAGE_NAME', defaultValue: 'youtube', description: 'Docker Image Name')
     }
 
     stages{
@@ -49,7 +53,7 @@ pipeline {
 
         stage('Trivy Analysis') {
             steps {
-                sh '''trivy fs . --format json -o trivy-check-report.json'''
+                sh '''trivy fs . --format json -o trivy-fs-report.json'''
             }
         }
 
@@ -69,7 +73,7 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh "docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $DOCKER_HUB_USERNAME/youtube:latest Application/."
+                sh "docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest Application/."
             }
         }
 
@@ -77,7 +81,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'dockerhub-cred', toolName: 'docker'){
-                        sh "docker push $DOCKER_HUB_USERNAME/youtube:latest "
+                        sh "docker push $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest "
                     }
                 }
             }
@@ -85,6 +89,12 @@ pipeline {
                 always {
                     sh '''docker rmi $(docker images --filter "dangling=true" -q --no-trunc)'''
                 }
+            }
+        }
+
+        stage('Test Docker Images') {
+            steps {
+                sh "trivy imaage $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest -o trivy-image-report.json"
             }
         }
     }
