@@ -79,7 +79,9 @@ pipeline {
             }
 
             post{
-                sh '''IP=$(curl https://ipinfo.io/ip) && echo "Staging Application is deployed at $IP"'''
+                success {
+                    sh '''IP=$(curl https://ipinfo.io/ip) && echo "Staging Application is deployed at $IP"'''
+                }
             }
         }
 
