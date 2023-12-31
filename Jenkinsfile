@@ -72,7 +72,7 @@ pipeline {
             }
         }
 
-        stage('Run Docker Images') {
+        stage('Run Docker Containers') {
         when { expression { params.action == 'create'}}
             steps {
                 sh "docker run -name $params.IMAGE_NAME -p 80:80 $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest"
@@ -85,7 +85,7 @@ pipeline {
             }
         }
 
-        stage('Run Docker Images') {
+        stage('Delete Docker Containers') {
         when { expression { params.action == 'delete'}}
             steps {
                 sh "docker rm -f $params.IMAGE_NAME"
