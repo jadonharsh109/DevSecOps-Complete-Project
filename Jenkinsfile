@@ -14,6 +14,7 @@ pipeline {
     parameters{
         string (name: 'DOCKER_HUB_USERNAME', defaultValue: 'jadonharsh', description: 'Docker Hub Username')
         string (name: 'IMAGE_NAME', defaultValue: 'youtube', description: 'Docker Image Name')
+        choice (name: 'action', choices: 'create\ndelete', description: 'Select create or destroy.')
     }
 
     stages{
@@ -65,15 +66,27 @@ pipeline {
         //     }
         // }
 
-        // stage ("Clean Workspace") {
-        //     steps {
-        //         cleanWs()
-        //     }
-        // }
-
         stage('Build Docker Images') {
             steps {
                 sh "docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest Application/."
+            }
+        }
+
+        stage('Run Docker Images') {
+        when { expression { params.action == 'create'}}
+            steps {
+                sh "docker run -name $params.IMAGE_NAME -p 80:80 $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest"
+            }
+
+            post{
+                sh '''IP=$(curl https://ipinfo.io/ip) && echo "Staging Application is deployed at $IP"'''
+            }
+        }
+
+        stage('Run Docker Images') {
+        when { expression { params.action == 'delete'}}
+            steps {
+                sh "docker rm -f $params.IMAGE_NAME"
             }
         }
 
@@ -94,7 +107,14 @@ pipeline {
 
         stage('Test Docker Images') {
             steps {
-                sh "trivy imaage $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest -o trivy-image-report.json"
+                sh "trivy image $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest -o trivy-image-report.json"
+            }
+        }
+
+        stage ("Clean Workspace") {
+        when { expression { params.action == 'delete'}}
+            steps {
+                cleanWs()
             }
         }
     }
