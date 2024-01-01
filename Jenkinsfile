@@ -103,13 +103,20 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'dockerhub-cred', toolName: 'docker'){
-                        sh "docker push $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest "
+                        sh '''
+                        docker tag ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:latest ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}
+                        docker tag ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:latest
+                        docker push ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}
+                        '''
                     }
                 }
             }
             post{
                 always {
-                    sh '''docker rmi $(docker images --filter "dangling=true" -q --no-trunc)'''
+                    sh '''
+                    docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+                    docker rmi ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}
+                    '''
                 }
             }
         }
@@ -117,7 +124,7 @@ pipeline {
         stage('Test Docker Images') {
         when { expression { params.action == 'create'}}
             steps {
-                sh "trivy image $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest -o trivy-image-report.json"
+                sh "trivy image $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:$BUILD_NUMBER -o trivy-image-report.json"
             }
         }
 
@@ -133,7 +140,7 @@ pipeline {
         when { expression { params.action == 'create'}}
             steps {
                 withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                    sh "kubectl apply -f Application/deployment.yml && sleep 30 && kubectl get svc"
+                    sh """helm upgrade --install --force microservice-charts Helm-Charts --set IMAGE_ID=${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}"""
                 }
             }
         }
