@@ -124,8 +124,11 @@ pipeline {
         when { expression { params.action == 'delete'}}
 
             steps {
-                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                    sh "kubectl get all -n kube-system"
+                withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY', secretKeyVariable: 'AWS_SECRET_KEY')]), withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                    sh '''
+                    aws configure set aws_access_key_id "${AWS_ACCESS_KEY}" && aws configure set aws_secret_access_key "${AWS_SECRET_KEY}" && aws configure set region "ap-south-1" && aws configure set output "json"
+                    kubectl get all -n kube-system
+                    '''
                 }
             }
         }
