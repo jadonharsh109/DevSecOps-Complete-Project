@@ -74,7 +74,7 @@ pipeline {
             when { expression { params.action == 'create'}}
             steps {
                 sh "
-                    docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest Application/.
+                docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest Application/.
                 "
                 sh """
                     docker rm -f ${params.IMAGE_NAME}
