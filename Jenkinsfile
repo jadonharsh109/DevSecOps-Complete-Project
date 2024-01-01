@@ -118,9 +118,7 @@ pipeline {
         stage('Test Docker Images') {
         when { expression { params.action == 'create'}}
             steps {
-                sh "
-                    trivy image $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:$BUILD_NUMBER -o trivy-image-report.json
-                "
+                sh "trivy image $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:$BUILD_NUMBER -o trivy-image-report.json"
             }
         }
 
