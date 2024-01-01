@@ -7,3 +7,6 @@ variable "secret_key" {
 variable "region" {
   type = string
 }
+variable "ami" {
+  type = string
+}

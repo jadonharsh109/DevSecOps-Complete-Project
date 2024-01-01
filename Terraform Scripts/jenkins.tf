@@ -1,20 +1,9 @@
-provider "aws" {
-  access_key = var.access_key
-  secret_key = var.secret_key
-  region     = var.region
-}
-
-resource "aws_key_pair" "jenkins-key-pair" {
-  key_name   = "jenkins-ssh-key"
-  public_key = file("${path.module}/ssh-key.pub")
-}
-
 resource "aws_security_group" "jenkins_security_group" {
   name        = "Jenkins_Security_group"
   description = "Jenkins_Security_group is created by Terraform"
 
   dynamic "ingress" {
-    for_each = [80, 443, 22, 8080, 9000]
+    for_each = [80, 22, 8080, 9000]
     iterator = port
 
     content {
@@ -37,9 +26,9 @@ resource "aws_security_group" "jenkins_security_group" {
 }
 
 resource "aws_instance" "jenkins_instance" {
-  ami             = "ami-03f4878755434977f"
+  ami             = var.ami
   instance_type   = "t2.large"
-  key_name        = aws_key_pair.jenkins-key-pair.key_name
+  key_name        = aws_key_pair.terraform-key-pair.key_name
   security_groups = ["${aws_security_group.jenkins_security_group.name}"]
   tags = {
     "Name" = "Jenkins-instance"
@@ -51,10 +40,6 @@ resource "aws_instance" "jenkins_instance" {
 
 }
 
-# output "Jenkinsurl" {
-#   value = "http://${aws_instance.jenkins_instance.public_ip}:8080"
-# }
-
 output "ssh" {
-  value = "ssh -i ssh-key ubuntu@${aws_instance.jenkins_instance.public_dns}"
+  value = "Ssh Key for Jenkins: ssh -i ssh-key ubuntu@${aws_instance.jenkins_instance.public_dns}"
 }
