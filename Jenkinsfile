@@ -62,7 +62,7 @@ pipeline {
         stage('Trivy Analysis and Result') {
             when { expression { params.action == 'create'}}
             steps {
-                sh '''trivy fs . --format json -o trivy-fs-report.json'''
+                sh "trivy fs . --format json -o trivy-fs-report.json"
                 // Uncomment the following lines if you want to fail the build on critical issues
                 // sh '''trivy fs . --exit-code 1 --severity CRITICAL --format json -o trivy-check-report.json'''
             }
@@ -73,8 +73,12 @@ pipeline {
         stage('Build and Run Docker Images') {
             when { expression { params.action == 'create'}}
             steps {
-                sh "docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest Application/."
-                sh """docker rm -f ${params.IMAGE_NAME} && docker run --name ${params.IMAGE_NAME} -p 80:80 -d ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:latest"""
+                sh "
+                    docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest Application/.
+                "
+                sh """
+                    docker rm -f ${params.IMAGE_NAME} && docker run --name ${params.IMAGE_NAME} -p 80:80 -d ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:latest
+                """
             }
             // Printing the Local Ip of Staging Application
             post {
@@ -115,7 +119,9 @@ pipeline {
         stage('Test Docker Images') {
         when { expression { params.action == 'create'}}
             steps {
-                sh "trivy image $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:$BUILD_NUMBER -o trivy-image-report.json"
+                sh "
+                    trivy image $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:$BUILD_NUMBER -o trivy-image-report.json
+                "
             }
         }
 
@@ -127,12 +133,20 @@ pipeline {
                 script {
                 // Configuring AWS Credentials which will help in authenticating EKS cluster 
                     withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY', secretKeyVariable: 'AWS_SECRET_KEY')]){
-                        sh ''' aws configure set aws_access_key_id "${AWS_ACCESS_KEY}" && aws configure set aws_secret_access_key "${AWS_SECRET_KEY}" && aws configure set region "ap-south-1" && aws configure set output "json"'''
+                        sh ''' 
+                            aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
+                            aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
+                            aws configure set region "ap-south-1"
+                            aws configure set output "json"
+                        '''
                     }
                 
                 // Installing HELM Charts along with variable "IMAGE_ID".
                     withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                        sh """helm upgrade --install --force ${params.IMAGE_NAME} Helm-Charts --set IMAGE_ID=${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}"""
+                        sh """
+                            helm upgrade --install --force ${params.IMAGE_NAME} Helm-Charts --set IMAGE_ID=${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}
+                            kubectl describe svc/my-app-service | grep "LoadBalancer Ingress"
+                        """
                     }
                 }
             }
