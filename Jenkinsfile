@@ -128,7 +128,7 @@ pipeline {
             }
         }
 
-        stage('kubeconfig Test') {
+        stage('Deploy on K8s') {
         when { expression { params.action == 'create'}}
             steps {
                 withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
@@ -137,7 +137,7 @@ pipeline {
             }
         }
 
-        stage('kubeconfig Test') {
+        stage('Delete on K8s') {
         when { expression { params.action == 'delete'}}
             steps {
                 withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
