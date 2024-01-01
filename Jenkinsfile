@@ -29,7 +29,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage ("SonarQube Analysis") {
         when { expression { params.action == 'create'}}
             steps{
@@ -117,6 +117,16 @@ pipeline {
         when { expression { params.action == 'create'}}
             steps {
                 sh "trivy image $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest -o trivy-image-report.json"
+            }
+        }
+
+        stage('kubeconfig Test') {
+        when { expression { params.action == 'delete'}}
+
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                    sh "kubectl get all -n kube-system"
+                }
             }
         }
 
