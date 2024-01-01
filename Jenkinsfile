@@ -80,7 +80,7 @@ pipeline {
         stage('Run Docker Containers') {
         when { expression { params.action == 'create'}}
             steps {
-                sh "docker run --name $params.IMAGE_NAME -p 80:80 -d $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest"
+                sh '''docker rm -f $params.IMAGE_NAME && docker run --name $params.IMAGE_NAME -p 80:80 -d $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest'''
             }
 
             post{
