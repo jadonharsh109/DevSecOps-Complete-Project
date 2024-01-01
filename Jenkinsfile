@@ -77,7 +77,8 @@ pipeline {
                     docker build --build-arg REACT_APP_RAPID_API_KEY=$API_KEY -t $params.DOCKER_HUB_USERNAME/$params.IMAGE_NAME:latest Application/.
                 "
                 sh """
-                    docker rm -f ${params.IMAGE_NAME} && docker run --name ${params.IMAGE_NAME} -p 80:80 -d ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:latest
+                    docker rm -f ${params.IMAGE_NAME}
+                    docker run --name ${params.IMAGE_NAME} -p 80:80 -d ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:latest
                 """
             }
             // Printing the Local Ip of Staging Application
