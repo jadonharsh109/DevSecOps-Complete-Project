@@ -145,8 +145,8 @@ pipeline {
                     withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
                         sh """
                             helm upgrade --install --force ${params.IMAGE_NAME} Helm-Charts --set IMAGE_ID=${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}
-                            kubectl describe svc/my-app-service\ |\ grep\ "LoadBalancer Ingress"
                         """
+                        sh 'kubectl describe svc/my-app-service | grep "LoadBalancer Ingress"'
                     }
                 }
             }
