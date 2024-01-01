@@ -135,7 +135,10 @@ pipeline {
                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
                             aws configure set region "ap-south-1"
                             aws configure set output "json"
+                            
                         '''
+                        // Uncomment the following lines if you want to copy .kubeconfig file from EKS Cluster
+                        // sh "aws eks update-kubeconfig --region ap-south-1 --name my-eks-cluster"
                     }
                 
                 // Installing HELM Charts along with variable "IMAGE_ID".
