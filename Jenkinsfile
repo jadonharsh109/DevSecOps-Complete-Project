@@ -105,7 +105,7 @@ pipeline {
                     withDockerRegistry(credentialsId: 'dockerhub-cred', toolName: 'docker'){
                         sh """
                         docker tag ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:latest ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}
-                        docker tag ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:latest
+                        docker push ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:latest
                         docker push ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}
                         """
                     }
