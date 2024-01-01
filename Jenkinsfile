@@ -129,10 +129,19 @@ pipeline {
         }
 
         stage('kubeconfig Test') {
+        when { expression { params.action == 'create'}}
+            steps {
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                    sh "kubectl apply -f Application/deployment.yml && sleep 30 && kubectl get svc"
+                }
+            }
+        }
+
+        stage('kubeconfig Test') {
         when { expression { params.action == 'delete'}}
             steps {
                 withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                    sh "kubectl get all -n kube-system"
+                    sh "kubectl delete -f Application/deployment.yml"
                 }
             }
         }

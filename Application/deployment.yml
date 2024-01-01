@@ -14,9 +14,9 @@ spec:
     spec:
       containers:
         - name: my-app
-          image: sevenajay/youtube:latest
+          image: jadonharsh/youtube:latest
           ports:
-            - containerPort: 3000  # Your Node.js application should listen on port 3000
+            - containerPort: 80  # Your Node.js application should listen on port 3000
 
 ---
 
@@ -30,5 +30,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80  # You can use port 80 here for HTTP traffic
-      targetPort: 3000  # This should match the port your Node.js application is running on (3000)
-  type: NodePort
+      targetPort: 80  # This should match the port your Node.js application is running on (3000)
+  type: LoadBalancer
