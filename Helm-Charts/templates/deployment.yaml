@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: my-app
-          image: {{values.IMAGE_ID}}
+          image: {{ .Values.IMAGE_ID }}
           ports:
             - containerPort: 80 # Your Node.js application should listen on port 3000
           resources:
