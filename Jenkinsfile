@@ -128,11 +128,12 @@ pipeline {
                 withCredentials([aws(credentialsId: 'aws-cred', accessKeyVariable: 'AWS_ACCESS_KEY', secretKeyVariable: 'AWS_SECRET_KEY')]){
                     sh ''' aws configure set aws_access_key_id "${AWS_ACCESS_KEY}" && aws configure set aws_secret_access_key "${AWS_SECRET_KEY}" && aws configure set region "ap-south-1" && aws configure set output "json"'''
                 }
-
-                steps {
-                    // Installing HELM Charts along with variable "IMAGE_ID".
-                    withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                        sh """helm upgrade --install --force ${params.IMAGE_NAME} Helm-Charts --set IMAGE_ID=${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}"""
+                script {
+                    steps {
+                        // Installing HELM Charts along with variable "IMAGE_ID".
+                        withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube_config', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                            sh """helm upgrade --install --force ${params.IMAGE_NAME} Helm-Charts --set IMAGE_ID=${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}"""
+                        }
                     }
                 }
             }
@@ -167,7 +168,6 @@ pipeline {
                 cleanWs()
             }
         }
-
     }
 
     // Pusing Notifications to the Discord Channels Using WebHooks
