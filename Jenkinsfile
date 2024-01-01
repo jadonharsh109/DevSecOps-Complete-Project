@@ -113,10 +113,10 @@ pipeline {
             }
             post{
                 always {
-                    sh '''
+                    sh """
                     docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
                     docker rmi ${params.DOCKER_HUB_USERNAME}/${params.IMAGE_NAME}:${BUILD_NUMBER}
-                    '''
+                    """
                 }
             }
         }
